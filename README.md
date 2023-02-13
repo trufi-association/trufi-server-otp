@@ -1,0 +1,1 @@
+cp -r 2.2.0/config/* ./data/
