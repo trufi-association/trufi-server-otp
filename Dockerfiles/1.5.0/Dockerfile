@@ -1,4 +1,4 @@
-FROM openjdk:8-jre
+FROM eclipse-temurin:11-jre-jammy
 
 ENV DEBIAN_FRONTEND=noninteractive
 
