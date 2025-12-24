@@ -1,52 +1,165 @@
-## INTRODUCTION 
+# OTP Server
 
-**Trufi’s Open Trip Planner (OTP) Server** tool allows you to view routes in your area using/based on the PBF and GTFS files you create. All required dependencies are included. 
+A Docker-based [OpenTripPlanner](https://www.opentripplanner.org/) (OTP) server for public transit routing. This project provides a simple way to run OTP with your own GTFS and PBF data files.
 
+Based on [Trufi's OTP Server](https://github.com/trufi-association/trufi-server-otp).
 
-## IMPORTANT INFORMATION
+## Prerequisites
 
-To use this tool, you need to create a GTFS file. You can learn how to use our [GTFS tool here](https://github.com/trufi-association/trufi-gtfs-builder/blob/main/README.md).
+- [Docker](https://www.docker.com/) and Docker Compose
+- A **GTFS file** with your transit data (see [trufi-gtfs-builder](https://github.com/trufi-association/trufi-gtfs-builder))
+- A **PBF file** (OpenStreetMap extract) for your area:
+  - Download from [Geofabrik](https://download.geofabrik.de/)
+  - Use [BoundingBox](https://boundingbox.klokantech.com/) to define your area
 
-To properly work, OTP requires a GTFS file and a location. In addition to a GTFS file, here is a brief overview of the tools you will use: Geofabrik, Docker, Boundingbox, and Open Trip Planner.
+## Quick Start
 
-Geofabrik is a map of the world that you can view and extract sub-regions from.   
+1. **Add your data files:**
+   ```
+   data/
+   ├── gtfs/           # Place GTFS files here (agency.txt, routes.txt, etc.)
+   └── your-area.osm.pbf
+   ```
 
-Boundingbox is a tool that allows users to select certain geographical areas and coordinates to create maps and sub-regions. 
+2. **Set OTP version** in `.env`:
+   ```bash
+   otpversion=2.8.1
+   ```
 
-Docker describes itself as an open platform for developing, shipping, and running applications.
+3. **Run the server:**
+   ```bash
+   docker-compose up
+   ```
 
-Open Trip Planner (OTP) describes itself as a family of open-source software projects that provides passenger information and transportation network analysis services.
+The first run will build the routing graph from your data (this takes a few minutes). Subsequent runs will load the cached graph and start faster.
 
+## Project Structure
 
-### STEPS
+```
+├── Dockerfiles/           # OTP version configurations
+│   ├── 1.5.0/
+│   ├── 2.0.0/
+│   ├── 2.2.0/
+│   ├── 2.4.0/
+│   ├── 2.7.0/
+│   └── 2.8.1/            # Latest (recommended)
+├── data/
+│   ├── gtfs/             # Your GTFS files
+│   ├── *.osm.pbf         # Your PBF file
+│   ├── otp-config.json   # OTP configuration (GraphQL, etc.)
+│   ├── router-config.json # Routing defaults
+│   └── graph.obj         # Generated routing graph (cached)
+├── docker-compose.yml
+├── .env                   # OTP version selector
+└── nginx.conf            # Optional reverse proxy config
+```
 
-+ **Step 1**: Download [Trufi’s Open Trip Planner Server tool]( https://github.com/trufi-association/trufi-server-otp).
+## Configuration
 
-+ **Step 2**: Clone the [tool](gh repo clone trufi-association/trufi-server-otp) 
+### OTP Version
 
-+ **Step 3**: Download [Docker]( https://www.docker.com/) and [Bounding Box]( https://boundingbox.klokantech.com/).
- 
-+ **Step 4**: Navigate to your editor. Open it. Paste the Trufi folder inside the new project.
+Set the version in `.env`:
 
-+ **Step 5**: Paste your GTFS file inside your project.
+```bash
+otpversion=2.8.1
+```
 
-+ **Step 6**: Copy and paste GTFS and PBF files into the Docker compose file.
+**Available versions:** `1.5.0`, `2.0.0`, `2.2.0`, `2.4.0`, `2.7.0`, `2.8.1`
 
-+ **Step 7**: To run our tool, open the Docker README file and follow the instructions to run the command in the editor.
-  
-+ **Step 8**: To run our OTP Server tool, open the README and run the command in the editor.
+> Note: Version 1.5.0 uses Java 11, versions 2.2.0+ use Java 21.
 
-+ **Step 9**: Choose what version of the program you want to run. 
+### Memory
 
-+ **Step 10**: Run comments in the terminal.
+By default, OTP uses 2GB of RAM. For larger datasets, increase memory by uncommenting in `docker-compose.yml`:
 
-+ **Step 11**: To check whether or not Docker is running type _Docker ps_ in the terminal.
+```yaml
+environment:
+  - JAVA_MAX_MEMORY=-Xmx8G
+```
 
- **Note**: if the program is running and there are errors, this is likely where you will see them.
+### GraphQL API
 
+The GraphQL API is configured in `data/otp-config.json`. By default, the Legacy GraphQL API (compatible with Digitransit) is enabled:
 
-### Optional Step
- 
-To view your project, open a port. 
-- [ ] Remove the slash(es) after the ports comment and open a localhost url using the port number listed. 
+```json
+{
+    "otpFeatures": {
+        "SandboxAPILegacyGraphQLApi": true
+    }
+}
+```
 
+**API Endpoints (OTP 2.x):**
+- GraphiQL UI: `http://localhost:8080/graphiql`
+- GTFS GraphQL: `http://localhost:8080/otp/gtfs/v1`
+- Legacy GraphQL: `http://localhost:8080/otp/routers/default/index/graphql`
+
+> Note: OTP 1.5.0 only supports REST API, not GraphQL.
+
+## Usage
+
+### API Endpoint
+
+Once running, the OTP API is available at:
+
+```
+http://localhost:8080/otp/
+```
+
+### Rebuilding the Graph
+
+To rebuild the routing graph (e.g., after updating GTFS data):
+
+```bash
+rm data/graph.obj
+docker-compose up
+```
+
+### Running in Background
+
+```bash
+docker-compose up -d
+```
+
+### Viewing Logs
+
+```bash
+docker-compose logs -f
+```
+
+### Stopping
+
+```bash
+docker-compose down
+```
+
+## Nginx Integration
+
+The included `nginx.conf` snippet can be used to proxy OTP behind Nginx:
+
+```nginx
+location /otp {
+    proxy_pass http://otp:8080/otp/routers/default;
+}
+```
+
+## Troubleshooting
+
+### Out of Memory Errors
+
+Increase `JAVA_MAX_MEMORY` in `docker-compose.yml`. Large cities may need 4-8GB.
+
+### Graph Build Fails
+
+- Ensure GTFS files are valid (check with [GTFS Validator](https://gtfs-validator.mobilitydata.org/))
+- Ensure PBF file covers the area of your GTFS stops
+
+### Container Won't Start
+
+Check logs with `docker-compose logs -f` to see the error.
+
+## Links
+
+- [OpenTripPlanner Documentation](https://docs.opentripplanner.org/)
+- [Trufi Association](https://www.trufi-association.org/)
+- [trufi-gtfs-builder](https://github.com/trufi-association/trufi-gtfs-builder)

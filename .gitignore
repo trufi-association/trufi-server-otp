@@ -1,1 +1,8 @@
-data/
+# Environment variables (local config)
+.env
+
+# Data files (large, user-specific)
+data/*.osm.pbf
+data/gtfs/
+data/graph.obj
+data/request.log
