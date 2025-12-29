@@ -118,6 +118,20 @@ echo "  PBF:     $PBF_PATH"
 echo "  Version: $OTP_VERSION"
 echo ""
 
+# Check if data directory already exists with data
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -d "$SCRIPT_DIR/data" ] && [ "$(ls -A "$SCRIPT_DIR/data" 2>/dev/null)" ]; then
+    echo -e "${YELLOW}Warning: data/ directory already contains files.${NC}"
+    read -p "Do you want to replace existing data? [y/N] " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo -e "${RED}Aborted.${NC}"
+        exit 1
+    fi
+    echo -e "${BLUE}Cleaning existing data directory...${NC}"
+    rm -rf "$SCRIPT_DIR/data"/*
+fi
+
 # Create data directory
 echo -e "${BLUE}Setting up data directory...${NC}"
 mkdir -p data
@@ -133,7 +147,6 @@ PBF_FILENAME=$(basename "$PBF_PATH")
 cp "$PBF_PATH" "data/$PBF_FILENAME"
 
 # Copy OTP config files for selected version
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_DIR="$SCRIPT_DIR/Dockerfiles/$OTP_VERSION/config"
 echo -e "${BLUE}Copying OTP config files for version $OTP_VERSION...${NC}"
 cp "$CONFIG_DIR"/*.json data/
