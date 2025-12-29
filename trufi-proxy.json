@@ -1,0 +1,6 @@
+{
+  "name": "otp",
+  "description": "OpenTripPlanner routing server for public transit directions",
+  "container": "otp",
+  "port": 8080
+}

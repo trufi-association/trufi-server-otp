@@ -6,3 +6,12 @@ data/*.osm.pbf
 data/gtfs/
 data/graph.obj
 data/request.log
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
