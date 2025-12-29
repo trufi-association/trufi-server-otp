@@ -1,8 +1,0 @@
-{
-    "streetRoutingTimeout": "5s",
-    "requestLogFile": "./request.log",
-    "routingDefaults": {
-        "numItineraries": 5,
-        "transferPenalty": 1000
-    }
-}

@@ -132,6 +132,12 @@ echo -e "${BLUE}Copying PBF file...${NC}"
 PBF_FILENAME=$(basename "$PBF_PATH")
 cp "$PBF_PATH" "data/$PBF_FILENAME"
 
+# Copy OTP config files for selected version
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_DIR="$SCRIPT_DIR/Dockerfiles/$OTP_VERSION/config"
+echo -e "${BLUE}Copying OTP config files for version $OTP_VERSION...${NC}"
+cp "$CONFIG_DIR"/*.json data/
+
 # Create .env file
 echo -e "${BLUE}Creating .env file...${NC}"
 cat > .env << EOF

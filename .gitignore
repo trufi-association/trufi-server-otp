@@ -2,11 +2,7 @@
 .env
 
 # Data files (large, user-specific)
-data/*.osm.pbf
-data/gtfs/
-data/graph.obj
-data/request.log
-
+data/
 # macOS
 .DS_Store
 
