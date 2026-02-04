@@ -1,8 +1,5 @@
 {
   "otpFeatures": {
-    "SandboxAPILegacyGraphQLApi": true
-  },
-  "server": {
-    "apiProcessingTimeout": "PT30S"
+    "GtfsGraphQlApi": true
   }
 }
