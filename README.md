@@ -24,7 +24,7 @@ A Docker-based [OpenTripPlanner](https://www.opentripplanner.org/) (OTP) server 
 Options:
 - `--gtfs <path>` - Path to GTFS file (`.zip`)
 - `--pbf <path>` - Path to OSM PBF file (`.osm.pbf`)
-- `--version <ver>` - OTP version (default: 2.8.1)
+- `--version <ver>` - OTP version (default: 2.10.0)
 
 ### 2. Start the server
 
@@ -43,7 +43,8 @@ The first run builds the routing graph from your data (this takes a few minutes)
 
 | Version | Java | Notes |
 |---------|------|-------|
-| 2.8.1   | 21   | Latest stable (recommended) |
+| 2.10.0  | 25   | Latest stable (recommended). Two-step start: builds the graph, then loads and serves it |
+| 2.8.1   | 21   | Last release on Java 21 |
 | 2.7.0   | 21   | |
 | 2.4.0   | 21   | |
 | 2.2.0   | 21   | |
@@ -65,7 +66,7 @@ JAVA_MAX_MEMORY=-Xmx8G
 Set in `.env` (created by `init.sh`):
 
 ```bash
-otpversion=2.8.1
+otpversion=2.10.0
 ```
 
 ## Project Structure
@@ -78,7 +79,8 @@ trufi-server-otp/
 │   ├── 2.2.0/
 │   ├── 2.4.0/
 │   ├── 2.7.0/
-│   └── 2.8.1/
+│   ├── 2.8.1/
+│   └── 2.10.0/
 ├── data/                  # Your data files (gitignored)
 │   ├── *.gtfs.zip        # GTFS file
 │   ├── *.osm.pbf         # PBF file
