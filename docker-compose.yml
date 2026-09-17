@@ -3,7 +3,7 @@ version: '3.8'
 services:
   otp:
     build:
-      context: ./Dockerfiles/${otpversion:-2.8.1}
+      context: ./Dockerfiles/${otpversion:-2.10.0}
       dockerfile: Dockerfile
     container_name: otp
     volumes:

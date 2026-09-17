@@ -8,7 +8,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Available OTP versions
-AVAILABLE_VERSIONS=("1.5.0" "2.0.0" "2.2.0" "2.4.0" "2.7.0" "2.8.1")
+AVAILABLE_VERSIONS=("1.5.0" "2.0.0" "2.2.0" "2.4.0" "2.7.0" "2.8.1" "2.10.0")
 
 print_header() {
     echo -e "${BLUE}"
@@ -26,12 +26,12 @@ print_usage() {
     echo -e "${YELLOW}Options:${NC}"
     echo "  --gtfs <path>      Path to GTFS file (.zip) or directory containing GTFS files"
     echo "  --pbf <path>       Path to OSM PBF file (.osm.pbf)"
-    echo "  --version <ver>    OTP version to use (default: 2.8.1)"
+    echo "  --version <ver>    OTP version to use (default: 2.10.0)"
     echo "  --help             Show this help message"
     echo ""
     echo -e "${YELLOW}Available OTP versions:${NC}"
     for v in "${AVAILABLE_VERSIONS[@]}"; do
-        if [ "$v" = "2.8.1" ]; then
+        if [ "$v" = "2.10.0" ]; then
             echo -e "  ${GREEN}$v${NC} (recommended)"
         else
             echo "  $v"
@@ -63,7 +63,7 @@ validate_version() {
 }
 
 # Default values
-OTP_VERSION="2.8.1"
+OTP_VERSION="2.10.0"
 GTFS_PATH=""
 PBF_PATH=""
 
